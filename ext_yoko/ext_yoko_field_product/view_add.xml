@@ -29,6 +29,21 @@
 		</field>
 	</record>
 
+	<record id="config_forma_producto_form" model="ir.ui.view">
+		<field name="name">config.forma.producto.form</field>
+		<field name="model">stock.forma</field>
+		<field name="arch" type="xml">
+			<form string="Configuracion de Formas de Productos">
+                <sheet>
+				    <group>						
+				        <field name="name"></field>
+				    </group>
+                </sheet>		
+			</form>
+		</field>
+	</record>
+
+
 	<record id="config_unidad_producto_form" model="ir.ui.view">
 		<field name="name">config.unidad.producto.form</field>
 		<field name="model">stock.unidad.negocio</field>
@@ -64,6 +79,16 @@
 		</field>
 	</record>
 
+	<record id="config_forma_producto_tree" model="ir.ui.view">
+		<field name="name">config.forma.producto.tree</field>
+		<field name="model">stock.forma</field>
+		<field name="arch" type="xml">
+			<tree string="Configuracion de forma de Productos" >
+				<field name="name" string="Nombre del Formas del Producto"></field>		
+			</tree>
+		</field>
+	</record>
+
 	<record id="config_unidad_producto_tree" model="ir.ui.view">
 		<field name="name">config.unidad.producto.tree</field>
 		<field name="model">stock.unidad.negocio</field>
@@ -88,6 +113,13 @@
 		<field name="view_id" ref="config_tipo_producto_tree"></field>
 	</record>
 
+	<record id="stock_forma_menu" model="ir.actions.act_window">
+		<field name="name">Configuracion de  Forma de Productos</field>
+		<field name="res_model">stock.forma</field>
+		<field name="view_mode">form,tree</field>
+		<field name="view_id" ref="config_forma_producto_tree"></field>
+	</record>
+
 	<record id="stock_unidad_menu" model="ir.actions.act_window">
 		<field name="name">Configuracion de  Unidad de Negocios de Productos</field>
 		<field name="res_model">stock.unidad.negocio</field>
@@ -110,9 +142,16 @@
 		sequence="61"/>
 
 	<menuitem
+		id="menu_stock_forma"
+		name="Configuraciones de Formas de Productos" 
+		parent="stock.menu_product_in_config_stock"
+		action="stock_forma_menu"
+		sequence="62"/>
+
+	<menuitem
 		id="menu_stock_unidad"
 		name="Configuraciones de Unidades de Negocios de Productos" 
 		parent="stock.menu_product_in_config_stock"
 		action="stock_unidad_menu"
-		sequence="62"/>
+		sequence="63"/>
 </odoo>

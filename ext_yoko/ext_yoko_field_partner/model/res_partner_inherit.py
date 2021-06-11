@@ -23,6 +23,8 @@ class ResPartner(models.Model):
     tipologia=fields.Many2one('res.tipologia')
     tienda=fields.Char(string="Tienda")
     deposito=fields.Char(string="Deposito")
+    zona=fields.Char(string="Zona")
+    razon=fields.Char(string="Razon Social")
    
     #uni_neg_id = fields.Many2one('stock.unidad.negocio')
 

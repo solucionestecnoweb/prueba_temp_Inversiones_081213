@@ -10,7 +10,8 @@
                       
                 <field name="sublineas" string="Sub Lineas"/>
                 <field name="modelo_id" string="Modelo del Producto" />
-                <field name="tipo_id" string="Tipo / Categoría" />
+                <field name="tipo_id" string="Tipo" />
+                <field name="forma_id" string="Forma" />
                 <field name="color" string="Color"/>
                 <field name="formato" string="Formato"/>
                 <field name="uso" string="Uso"/>

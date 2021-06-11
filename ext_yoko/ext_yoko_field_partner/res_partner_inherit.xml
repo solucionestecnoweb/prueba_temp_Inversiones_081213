@@ -13,6 +13,7 @@
                 <page string="Datos adicionales del cliente" attrs="{'invisible': [('customer_rank', '=', 0)]}">
                     <group name="general_cli">
                         <group name="cuadro1">
+                            <field name="razon" string="Razón Social"/>
                             <field name="canal"/>
                             <field name="mercado" string="Mercado"/>
                             <field name="vendedor"/>
@@ -20,6 +21,7 @@
                             <field name="responsable"/>
                         </group>
                         <group name="cuadro2">
+                            <field name="zona"/>
                             <field name="istagram"/>
                             <field name="activo"/>
                             <field name="tipologia" string="Tipología"/>
