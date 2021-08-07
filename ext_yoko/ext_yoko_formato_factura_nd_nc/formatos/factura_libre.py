@@ -92,6 +92,51 @@ class AccountMove(models.Model):
                 fecha_entrega=det.date_order
         return fecha_entrega
 
+    def razon_dev(self):
+        motivo="---"
+        busca_razon = self.env['account.move.reversal'].search([('move_id','=',self.reversed_entry_id.id)])
+        if busca_razon:
+            for det in busca_razon:
+                motivo=det.reason
+        return motivo
+
+    def base_imponible_fact_orig(self,fact_org):
+        acum=0
+        if self.reversed_entry_id.id:
+            busca_original = self.env['account.move.line'].search([('move_id','=',self.reversed_entry_id.id)])
+        else:
+            busca_move= self.env['account.move'].search([('invoice_number','=',fact_org)])
+            if busca_move:
+                for rec in busca_move:
+                    busca_original = self.env['account.move.line'].search([('move_id','=',rec.id)])
+        if busca_original:
+            for det in busca_original:
+                if det.product_id.id and det.tax_ids.amount:
+                    acum=acum+det.price_subtotal
+        return acum
+
+    def iva_fact_orig(self,fact_org):
+        iva=0
+        if self.reversed_entry_id.id:
+            busca_original = self.env['account.move'].search([('id','=',self.reversed_entry_id.id)])
+        else:
+            busca_original = self.env['account.move'].search([('invoice_number','=',fact_org)])
+        if busca_original:
+            for det in busca_original:
+                iva=det.amount_tax
+        return iva
+
+    def neto_fact_orig(self,fact_org):
+        neto=0
+        if self.reversed_entry_id.id:
+            busca_original = self.env['account.move'].search([('id','=',self.reversed_entry_id.id)])
+        else:
+            busca_original = self.env['account.move'].search([('invoice_number','=',fact_org)])
+        if busca_original:
+            for det in busca_original:
+                neto=det.amount_total
+        return neto
+
 
     def doc_cedula(self,aux):
         #nro_doc=self.partner_id.vat
