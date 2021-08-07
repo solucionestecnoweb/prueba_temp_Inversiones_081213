@@ -23,6 +23,7 @@ class AccountMove(models.Model):
     act_nota_entre=fields.Boolean(default=False)
     correlativo_nota_entrega = fields.Char(required=False)
     doc_currency_id = fields.Many2one("res.currency", string="Moneda del documento Físico")
+    persona_contacto=fields.Char()
 
 
     def float_format(self,valor):
@@ -66,6 +67,14 @@ class AccountMove(models.Model):
         #self.refuld_number_pro=name
         return name
 
+    def muestra_nota_entrega(self):
+        valor=0
+        if self.act_nota_entre==False:
+            raise UserError(_('Este documento no esta activado como Nota de entrega. Por Favor active la opcion "Aplica Nota de Entrega?"'))
+        else:
+            valor=self.correlativo_nota_entrega
+        return valor
+
     def formato_fecha(self,date):
         fecha = str(date)
         fecha_aux=fecha
@@ -76,6 +85,7 @@ class AccountMove(models.Model):
         return resultado
 
     def doc_origen(self,valor):
+        fecha_entrega=self.invoice_date
         busca_origen = self.env['sale.order'].search([('name','=',valor)])
         if busca_origen:
             for det in busca_origen:

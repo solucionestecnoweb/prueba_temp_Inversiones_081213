@@ -39,7 +39,7 @@
                           <t t-esc="docs.company_id.city"/>
                           <t t-esc="docs.company_id.zip"/>
                         </td>
-                       <td style="font-size:20px;" align="center">DETALLE DE ORDEN DE ENTREGA Nº</td>
+                       <td style="font-size:20px;" align="center">DETALLE DE ORDEN DE ENTREGA Nº: <t t-esc="docs.muestra_nota_entrega()"/></td>
                       </tr>
                       <tr>
                         <td style="font-size:14px;">
@@ -73,8 +73,65 @@
                         
                       </tr>
                       <tr style="font-size:14px;">
-                        <td>Persona de Contacto:</td>
+                        <td>Persona de Contacto: <t t-esc="docs.persona_contacto"/></td>
                         <td>&amp;nbsp;</td>
+                      </tr>
+                      <tr>
+                        <td colspan="2"><hr size="5"/></td>
+                      </tr>
+                    </table>
+                    <table width="100%" class="table table-bordered">
+                      <tr align="center" style="font-size:12px; background-color:#EEEBEC; color: #253a0f;">
+                        <td>Referencia</td>
+                        <td>Descripción</td>
+                        <td>Cant.</td>
+                        <td>Unidad de Medida</td>
+                        <td>Volumen</td>
+                        <td>Peso</td>
+                      </tr>
+                      <t t-set="enum" t-value="0"/>
+                      <t t-set="espacio_blanco" t-value="10"/><!-- VALOR DEL TOTAL DE ESPACIO EN EL DETALLE DE LA FACTURA -->
+                      <t t-set="acum_subtotal" t-value="0"/>
+                      <t t-set="acum_alicuota_general" t-value="0"/>
+                      <t t-set="acum_alicuota_reducida" t-value="0"/>
+                      <t t-set="acum_alicuota_adicional" t-value="0"/>
+                      <t t-set="total_factura" t-value="0"/>
+
+                      <t t-foreach="docs.invoice_line_ids" t-as="o">
+                        <t t-set="enum" t-value="enum+1"/>
+                      <tr style="font-size:12px;">
+                      <td align="center">[<t t-esc="o.product_id.default_code"/>]</td>
+                        <td><t t-esc="o.product_id.name"/></td>
+                        <td><div align="center"><t t-esc="o.quantity"/></div></td>
+                        <td><div align="center"><t t-esc="o.product_uom_id.name"/></div></td>
+                        <td><div align="center">0,0</div></td>
+                        <td><div align="right">0,0</div></td>
+                      </tr>
+                      </t>
+                    </table>
+                    <hr size="10"/>
+
+                    <table width="100%">
+                      <!--  RUTINA QUE LLENA ESPACIO EN BLANCO DESPUES DEL DETALLE DE LA FACTURA -->
+                      <t t-set="espacio_blanco" t-value="espacio_blanco-enum"/>
+                      <t t-foreach="range(espacio_blanco)" t-as="i">
+                        <tr><td> &amp;nbsp;</td></tr>
+                      </t>
+                      <tr>
+                        <td>
+                          Entregado por: ______________________________________
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          Recibido por:  _______________________________________
+                        </td>
+                      </tr>
+                      <tr>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td align="center">SE AGRADECE AL CLIENTE REVISAR LA MERCANCIA. UNA VEZ CONFORMADA ESTA NOTA LA EMPRESA NO ASUME RESPONSABILIDAD ALGUNA</td>
                       </tr>
                     </table>
                 </div>
@@ -85,7 +142,7 @@
                 </div>
                 <div class="footer">
                  
-                  foteer
+                  &amp;nbsp;
                 </div>
               </t>
             </t>
