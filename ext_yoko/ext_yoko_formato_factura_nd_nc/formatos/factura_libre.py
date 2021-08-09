@@ -41,6 +41,7 @@ class AccountMove(models.Model):
         super().action_post()
         if self.act_nota_entre==True:
             self.correlativo_nota_entrega=self.get_nro_nota_entrega()
+        self.valida_fact_ref()
 
     def get_nro_nota_entrega(self):
         '''metodo que crea el Nombre del asiento contable si la secuencia no esta creada, crea una con el
@@ -66,6 +67,16 @@ class AccountMove(models.Model):
             name = IrSequence.next_by_code(SEQUENCE_CODE)
         #self.refuld_number_pro=name
         return name
+
+    def valida_fact_ref(self):
+        busca_fact= self.env['account.move'].search([('invoice_number','=',self.ref)])
+        if not busca_fact:
+            busca_fact2 = self.env['account.move'].search([('name','=',self.ref)])
+            if busca_fact2:
+                for dett in busca_fact2:
+                    self.ref=dett.invoice_number
+            else:
+                raise UserError(_('La factura de referencia afectada introducida no coincide con una factura anterior o no existe'))
 
     def muestra_nota_entrega(self):
         valor=0
