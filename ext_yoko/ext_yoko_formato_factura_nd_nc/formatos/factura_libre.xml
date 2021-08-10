@@ -83,6 +83,7 @@
                       <t t-set="acum_alicuota_reducida" t-value="0"/>
                       <t t-set="acum_alicuota_adicional" t-value="0"/>
                       <t t-set="total_factura" t-value="0"/>
+                      <t t-set="descuento" t-value="0"/>
                       <t t-foreach="docs.invoice_line_ids" t-as="o">
                         <t t-set="enum" t-value="enum+1"/>
                         <tr style="font-size:13px;" height="30">
@@ -91,7 +92,10 @@
                           <td><div align="center"><t t-esc="o.quantity"/></div></td>
                           <td align="center"><t t-esc="o.product_uom_id.name"/></td>
                           <td><div align="right"><t t-esc="o.float_format(o.fact_div_line(o.price_unit))"/></div></td>
-                          <td align="center"><t t-esc="o.discount"/></td>
+                          <td align="center">
+                            <t t-esc="o.discount"/>
+                            <t t-set="descuento" t-value="descuento+(o.quantity*o.price_unit*o.discount/100)"/>
+                          </td>
                           <td><div align="center"><t t-esc="o.tax_ids.amount"/>%</div></td>
                           <td><div align="right"><t t-esc="o.float_format(o.fact_div_line(o.price_subtotal))"/>
                               <t t-set="acum_subtotal" t-value="acum_subtotal+o.price_subtotal"/></div>
@@ -129,7 +133,7 @@
                         OTROS DESC.%
                       </td>
                       <td align="right">
-                        0,0
+                        <div align="right"><t t-esc="docs.float_format(docs.fact_div(descuento))"/></div>
                       </td>
                     </tr>
 
