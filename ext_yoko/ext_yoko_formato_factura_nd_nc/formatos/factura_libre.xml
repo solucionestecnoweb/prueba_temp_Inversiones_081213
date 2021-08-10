@@ -37,13 +37,25 @@
                     </tr>
                     <tr>
                       <td>TELEFONOS: <t t-esc="docs.partner_id.phone"/>/<t t-esc="docs.partner_id.mobile"/></td>
-                      <td align="right"> CONDICION: </td>
-                      <td align="right"><t t-esc="docs.invoice_payment_term_id.name"/></td>
+                      <t t-if="docs.type in ('out_invoice')">
+                        <td align="right"> CONDICION: </td>
+                        <td align="right"><t t-esc="docs.condicion"/></td>
+                      </t>
+                      <t t-else="">
+                        <td>&amp;nbsp;</td>
+                        <td>&amp;nbsp;</td>
+                      </t>
                     </tr>
                     <tr>
                       <td>DIRECCION: <t t-esc="docs.partner_id.street"/></td>
-                      <td align="right"> VENDEDOR: </td>
-                      <td align="right"><t t-esc="docs.invoice_user_id.name"/></td>
+                      <t t-if="docs.type in ('out_invoice')">
+                        <td align="right"> VENDEDOR: </td>
+                        <td align="right"><t t-esc="docs.vendedor.name"/></td>
+                      </t>
+                      <t t-else="">
+                        <td>&amp;nbsp;</td>
+                        <td>&amp;nbsp;</td>
+                      </t>
                     </tr>
                     <tr>
                       <td colspan="3">.</td>
@@ -110,6 +122,15 @@
                       <td colspan="1"><div align="right"><t t-esc="docs.float_format(docs.fact_div(acum_subtotal))"/>
                       <t t-esc="docs.doc_currency_id.symbol"/></div></td>
                       <t t-set="total_factura" t-value="total_factura+acum_subtotal"/>
+                    </tr>
+
+                    <tr style="font-size:13px;" height="30">
+                      <td colspan="7" align="right">
+                        OTROS DESC.%
+                      </td>
+                      <td align="right">
+                        0,0
+                      </td>
                     </tr>
 
                     <tr style="font-size:13px;" height="30">

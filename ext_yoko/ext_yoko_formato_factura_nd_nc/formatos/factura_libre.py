@@ -23,6 +23,8 @@ class AccountMove(models.Model):
     act_nota_entre=fields.Boolean(default=False)
     correlativo_nota_entrega = fields.Char(required=False)
     doc_currency_id = fields.Many2one("res.currency", string="Moneda del documento Físico")
+    condicion = fields.Char()
+    vendedor = fields.Many2one("hr.employee",string="Vendedor")
     tipo_transporte=fields.Char()
     persona_contacto=fields.Char()
 
