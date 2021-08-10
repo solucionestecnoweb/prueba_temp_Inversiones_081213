@@ -73,6 +73,10 @@
                         
                       </tr>
                       <tr style="font-size:14px;">
+                        <td>Transporte: <t t-esc="docs.tipo_transporte"/></td>
+                        <td>&amp;nbsp;</td>
+                      </tr>
+                      <tr style="font-size:14px;">
                         <td>Persona de Contacto: <t t-esc="docs.persona_contacto"/></td>
                         <td>&amp;nbsp;</td>
                       </tr>
@@ -84,7 +88,9 @@
                       <tr align="center" style="font-size:12px; background-color:#EEEBEC; color: #253a0f;">
                         <td>Referencia</td>
                         <td>Descripción</td>
-                        <td>Cant.</td>
+                        <td>Cant. Cajas</td>
+                        <td>Cant.<br/>Piezas/Caja</td>
+                        <td>Cant. Piezas</td>
                         <td>Unidad de Medida</td>
                         <td>Volumen</td>
                         <td>Peso</td>
@@ -103,9 +109,12 @@
                       <td align="center">[<t t-esc="o.product_id.default_code"/>]</td>
                         <td><t t-esc="o.product_id.name"/></td>
                         <td><div align="center"><t t-esc="o.quantity"/></div></td>
-                        <td><div align="center"><t t-esc="o.product_uom_id.name"/></div></td>
-                        <td><div align="center">0,0</div></td>
-                        <td><div align="right">0,0</div></td>
+                        <td align="center"><t t-esc="o.product_uom_id.factor_inv"/></td>
+                        <td align="center"><t t-esc="o.product_uom_id.factor_inv*o.quantity"/></td>
+                        <td><div align="center">UNI</div></td>
+                        <!--td><div align="center"><t t-esc="o.product_uom_id.name"/></div></td-->
+                        <td><div align="center"><t t-esc="o.product_id.weight"/></div></td>
+                        <td><div align="right"><t t-esc="o.product_id.volume"/></div></td>
                       </tr>
                       </t>
                     </table>

@@ -23,6 +23,7 @@ class AccountMove(models.Model):
     act_nota_entre=fields.Boolean(default=False)
     correlativo_nota_entrega = fields.Char(required=False)
     doc_currency_id = fields.Many2one("res.currency", string="Moneda del documento Físico")
+    tipo_transporte=fields.Char()
     persona_contacto=fields.Char()
 
 
@@ -48,9 +49,9 @@ class AccountMove(models.Model):
         nombre: 'l10n_ve_cuenta_retencion_iva'''
 
         self.ensure_one()
-        SEQUENCE_CODE = 'l10n_ve_nro_control_nota_entrega'
-        company_id = 1
-        IrSequence = self.env['ir.sequence'].with_context(force_company=1)
+        SEQUENCE_CODE = 'l10n_ve_nro_control_nota_entrega'+str(self.company_id.id)
+        company_id = self.company_id.id
+        IrSequence = self.env['ir.sequence'].with_context(force_company=company_id)
         name = IrSequence.next_by_code(SEQUENCE_CODE)
 
         # si aún no existe una secuencia para esta empresa, cree una
@@ -62,21 +63,22 @@ class AccountMove(models.Model):
                 'implementation': 'no_gap',
                 'padding': 4,
                 'number_increment': 1,
-                'company_id': 1,
+                'company_id': company_id,
             })
             name = IrSequence.next_by_code(SEQUENCE_CODE)
         #self.refuld_number_pro=name
         return name
 
     def valida_fact_ref(self):
-        busca_fact= self.env['account.move'].search([('invoice_number','=',self.ref)])
-        if not busca_fact:
-            busca_fact2 = self.env['account.move'].search([('name','=',self.ref)])
-            if busca_fact2:
-                for dett in busca_fact2:
-                    self.ref=dett.invoice_number
-            else:
-                raise UserError(_('La factura de referencia afectada introducida no coincide con una factura anterior o no existe'))
+        if self.type=="out_refund" or self.type=="out_receipt":
+            busca_fact= self.env['account.move'].search([('invoice_number','=',self.ref)])
+            if not busca_fact:
+                busca_fact2 = self.env['account.move'].search([('name','=',self.ref)])
+                if busca_fact2:
+                    for dett in busca_fact2:
+                        self.ref=dett.invoice_number
+                else:
+                    raise UserError(_('La factura de referencia afectada introducida no coincide con una factura anterior o no existe'))
 
     def muestra_nota_entrega(self):
         valor=0
