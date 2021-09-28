@@ -4,6 +4,7 @@ import logging
 from odoo import api, fields, models, _
 from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError
+from odoo.exceptions import Warning
 
 class AccontPartialReconcile(models.Model):
     _inherit = "account.partial.reconcile"
@@ -22,6 +23,16 @@ class AccountMove(models.Model):
     usar_anticipo = fields.Boolean(defaul=False)
 
     #rel_field = fields.Char(string='Name', related='payment_id.amount')
+
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        xfind = self.env['account.payment'].search([
+            ('partner_id', '=', self.partner_id.id),
+            ('anticipo', '=', True),
+            ('state', '=', 'posted')
+        ])
+        if len(xfind) > 0:
+            return {'warning': {'message':'Este Cliente/Proveedor posee un anticipo disponible'}}
 
     def _compute_monto(self):
         self.monto_anticipo = self.payment_id.saldo_disponible
@@ -170,7 +181,7 @@ class AccountMove(models.Model):
             value['amount_residual_currency'] = self.amount_currency(valores) #loca14
             move_line_id2 = move_line_obj.create(value)
 
-    def conv_div_extranjera(self,valor):#loca 14 COPIAR ESTE CODIGO COMPLETO
+    def conv_div_extranjera(self,valor):#loca14 COPIAR ESTE CODIGO COMPLETO
         self.currency_id.id
         fecha_contable_doc=self.date
         monto_factura=self.amount_total
@@ -189,14 +200,14 @@ class AccountMove(models.Model):
         #raise UserError(_('moneda compañia: %s')%resultado)
         return resultado
 
-    def amount_currency(self,valor): #loca 14 COPIAR ESTE CODIGO COMPLETO
+    def amount_currency(self,valor): #loca14 COPIAR ESTE CODIGO COMPLETO
         if self.currency_id.id!=self.env.company.currency_id.id:
             resultado=valor
         else:
             resultado=0.0
         return resultado
 
-    def moneda(self): #loca 14 COPIAR ESTE CODIGO COMPLETO
+    def moneda(self): #loca14 COPIAR ESTE CODIGO COMPLETO
         resultado=''
         if self.currency_id.id!=self.env.company.currency_id.id:
             resultado=self.currency_id.id

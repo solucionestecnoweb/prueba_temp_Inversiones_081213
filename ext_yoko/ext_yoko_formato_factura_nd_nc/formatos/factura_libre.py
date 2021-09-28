@@ -5,6 +5,7 @@ from odoo import models, fields, api, _, tools
 from odoo.exceptions import UserError
 import openerp.addons.decimal_precision as dp
 import logging
+from base64 import encodestring
 
 import io
 from io import BytesIO
@@ -16,6 +17,11 @@ import csv
 import xlwt
 import xml.etree.ElementTree as ET
 
+class Partners(models.Model):
+    _inherit = 'account.journal'
+
+    tipo_doc = fields.Selection([('nc', 'Nota de Credito'),('nb', 'Nota de Debito'),('fc','Factura'),('ne','Nota de Entrega')])
+
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
@@ -23,10 +29,31 @@ class AccountMove(models.Model):
     act_nota_entre=fields.Boolean(default=False)
     correlativo_nota_entrega = fields.Char(required=False)
     doc_currency_id = fields.Many2one("res.currency", string="Moneda del documento Físico")
+    currency_company_id = fields.Many2one("res.currency", string="Moneda de la compañia",default=lambda self: self.env.company.currency_id)
     condicion = fields.Char()
     vendedor = fields.Many2one("hr.employee",string="Vendedor")
     tipo_transporte=fields.Char()
     persona_contacto=fields.Char()
+
+    def action_invoice_sent(self):
+        if self.partner_id.email:
+            template = self.env.ref('ext_yoko_formato_factura_nd_nc.email_template_fxo_send_email_fact', False)
+            attachment_ids = []
+            attach = {}
+            result_pdf, type = self.env['ir.actions.report']._get_report_from_name('ext_yoko_formato_factura_nd_nc.report_invoice_with_payments_electronica').render_qweb_pdf(self.id)
+            attach['name'] = 'Factura.pdf'
+            attach['type'] = 'binary'
+            attach['datas'] = encodestring(result_pdf)
+            # attach['datas_fname'] = 'Comprobante de IVA.pdf'
+            attach['res_model'] = 'mail.compose.message'
+            attachment_id = self.env['ir.attachment'].create(attach)
+            attachment_ids.append(attachment_id.id)
+
+            mail = template.send_mail(self.id, force_send=True,email_values={'attachment_ids': attachment_ids}) #envia mail
+            if mail:
+                self.message_post(body=_("Enviado email al Cliente: %s"%self.partner_id.name))
+                self.state_dte_partner = 'sent'
+                print('Correo Enviado a '+ str(self.partner_id.email))
 
 
     def float_format(self,valor):
@@ -43,7 +70,10 @@ class AccountMove(models.Model):
     def action_post(self):
         super().action_post()
         if self.act_nota_entre==True:
-            self.correlativo_nota_entrega=self.get_nro_nota_entrega()
+            if self.journal_id.tipo_doc=="ne":
+                self.correlativo_nota_entrega=self.get_nro_nota_entrega()
+            else:
+                raise UserError(_('Diario no adecuado para la nota de entrega. Seleccione el diario correcto o vaya a configuracion->diario y en el campo tipo_doc coloque Nota de entrega"'))
         self.valida_fact_ref()
 
     def get_nro_nota_entrega(self):
@@ -209,6 +239,202 @@ class AccountMove(models.Model):
         else:
             resultado=valor
         return resultado
+        
+    def get_invoice_number_cli(self):
+        '''metodo que crea el Nombre del asiento contable si la secuencia no esta creada, crea una con el
+        nombre: 'l10n_ve_cuenta_retencion_iva'''
+        name=''
+        if self.act_nota_entre==False:
+            self.ensure_one()
+            SEQUENCE_CODE = 'l10n_ve_nro_factura_cliente'+str(self.company_id.id) #loca 14
+            company_id = self.company_id.id #loca 14
+            IrSequence = self.env['ir.sequence'].with_context(force_company=company_id) #loca 14
+            name = IrSequence.next_by_code(SEQUENCE_CODE)
+
+            # si aún no existe una secuencia para esta empresa, cree una
+            if not name:
+                IrSequence.sudo().create({
+                    'prefix': 'FACT/',
+                    'name': 'Localización Venezolana Factura cliente %s' % 1,
+                    'code': SEQUENCE_CODE,
+                    'implementation': 'no_gap',
+                    'padding': 4,
+                    'number_increment': 1,
+                    'company_id': company_id, #loca 14
+                })
+                name = IrSequence.next_by_code(SEQUENCE_CODE)
+            #self.invoice_number_cli=name
+        """else:
+            name='0'"""
+        return name
+
+    def get_invoice_ctrl_number_cli(self):
+        '''metodo que crea el Nombre del asiento contable si la secuencia no esta creada, crea una con el
+        nombre: 'l10n_ve_cuenta_retencion_iva'''
+        name=''
+        if self.act_nota_entre==False:
+            self.ensure_one()
+            SEQUENCE_CODE = 'l10n_ve_nro_control_factura_cliente'+str(self.company_id.id) #loca 14
+            company_id = self.company_id.id #loca 14
+            IrSequence = self.env['ir.sequence'].with_context(force_company=company_id) # loca 14
+            name = IrSequence.next_by_code(SEQUENCE_CODE)
+
+            # si aún no existe una secuencia para esta empresa, cree una
+            if not name:
+                IrSequence.sudo().create({
+                    'prefix': '00-',
+                    'name': 'Localización Venezolana nro control Factura cliente %s' % 1,
+                    'code': SEQUENCE_CODE,
+                    'implementation': 'no_gap',
+                    'padding': 4,
+                    'number_increment': 1,
+                    'company_id': company_id, #loca 14
+                })
+                name = IrSequence.next_by_code(SEQUENCE_CODE)
+            #self.invoice_number_cli=name
+        """else:
+            name='0'"""
+        return name
+
+    def get_refuld_number_cli(self):# nota de credito cliente
+        '''metodo que crea el Nombre del asiento contable si la secuencia no esta creada, crea una con el
+        nombre: 'l10n_ve_cuenta_retencion_iva'''
+        name=''
+        if self.act_nota_entre==False:
+            self.ensure_one()
+            SEQUENCE_CODE = 'l10n_ve_nro_factura_nota_credito_cliente'+str(self.company_id.id) #loca 14
+            company_id = self.company_id.id # loca 14
+            IrSequence = self.env['ir.sequence'].with_context(force_company=company_id) # loca 14
+            name = IrSequence.next_by_code(SEQUENCE_CODE)
+
+            # si aún no existe una secuencia para esta empresa, cree una
+            if not name:
+                IrSequence.sudo().create({
+                    'prefix': 'NCC/',
+                    'name': 'Localización Venezolana Nota Credito Cliente %s' % 1,
+                    'code': SEQUENCE_CODE,
+                    'implementation': 'no_gap',
+                    'padding': 4,
+                    'number_increment': 1,
+                    'company_id': company_id, # loca 14
+                })
+                name = IrSequence.next_by_code(SEQUENCE_CODE)
+            #self.refuld_number_cli=name
+        """else:
+            name='0'"""
+        return name
+
+    def get_refuld_ctrl_number_cli(self):
+        '''metodo que crea el Nombre del asiento contable si la secuencia no esta creada, crea una con el
+        nombre: 'l10n_ve_cuenta_retencion_iva'''
+        name=''
+        if self.act_nota_entre==False:  
+            self.ensure_one()
+            SEQUENCE_CODE = 'l10n_ve_nro_control_nota_credito_cliente'+str(self.company_id.id) #loca 14
+            company_id = self.company_id.id #loca 14
+            IrSequence = self.env['ir.sequence'].with_context(force_company=company_id) #loca 14
+            name = IrSequence.next_by_code(SEQUENCE_CODE)
+
+            # si aún no existe una secuencia para esta empresa, cree una
+            if not name:
+                IrSequence.sudo().create({
+                    'prefix': '00-',
+                    'name': 'Localización Venezolana nro control Nota Credito Cliente %s' % 1,
+                    'code': SEQUENCE_CODE,
+                    'implementation': 'no_gap',
+                    'padding': 4,
+                    'number_increment': 1,
+                    'company_id': company_id, #loca 14
+                })
+                name = IrSequence.next_by_code(SEQUENCE_CODE)
+            #self.refuld_number_cli=name
+        """else:
+            name='0'"""
+        return name
+
+    def get_refuld_number_pro(self): #nota de debito Cliente
+        '''metodo que crea el Nombre del asiento contable si la secuencia no esta creada, crea una con el
+        nombre: 'l10n_ve_cuenta_retencion_iva'''
+        name=''
+        if self.act_nota_entre==False:
+            self.ensure_one()
+            SEQUENCE_CODE = 'l10n_ve_nro_factura_nota_debito_cliente'+str(self.company_id.id) #loca 14
+            company_id = self.company_id.id #loca14
+            IrSequence = self.env['ir.sequence'].with_context(force_company=company_id) #loca 14
+            name = IrSequence.next_by_code(SEQUENCE_CODE)
+
+            # si aún no existe una secuencia para esta empresa, cree una
+            if not name:
+                IrSequence.sudo().create({
+                    'prefix': 'NDC/',
+                    'name': 'Localización Venezolana Nota Debito Cliente %s' % 1,
+                    'code': SEQUENCE_CODE,
+                    'implementation': 'no_gap',
+                    'padding': 4,
+                    'number_increment': 1,
+                    'company_id': company_id, #loca 14
+                })
+                name = IrSequence.next_by_code(SEQUENCE_CODE)
+            #self.refuld_number_pro=name
+        """else:
+            name='0'"""
+        return name
+
+    def get_refuld_ctrl_number_pro(self):
+        '''metodo que crea el Nombre del asiento contable si la secuencia no esta creada, crea una con el
+        nombre: 'l10n_ve_cuenta_retencion_iva'''
+        name=''
+        if self.act_nota_entre==False:
+            self.ensure_one()
+            SEQUENCE_CODE = 'l10n_ve_nro_control_nota_debito_cliente'+str(self.company_id.id) #loca 14
+            company_id = self.company_id.id #loca 14
+            IrSequence = self.env['ir.sequence'].with_context(force_company=company_id) #loca 14
+            name = IrSequence.next_by_code(SEQUENCE_CODE)
+
+            # si aún no existe una secuencia para esta empresa, cree una
+            if not name:
+                IrSequence.sudo().create({
+                    'prefix': '00-',
+                    'name': 'Localización Venezolana Nro control Nota debito cliente %s' % 1,
+                    'code': SEQUENCE_CODE,
+                    'implementation': 'no_gap',
+                    'padding': 4,
+                    'number_increment': 1,
+                    'company_id': company_id, # loca 14
+                })
+                name = IrSequence.next_by_code(SEQUENCE_CODE)
+            #self.refuld_number_pro=name
+        """else:
+            name='0'"""
+        return name
+
+    def get_invoice_ctrl_number_unico(self):
+        '''metodo que crea el Nombre del asiento contable si la secuencia no esta creada, crea una con el
+        nombre: 'l10n_ve_cuenta_retencion_iva'''
+        name=''
+        if self.act_nota_entre==False:
+            self.ensure_one()
+            SEQUENCE_CODE = 'l10n_ve_nro_control_unico_formato_libre'+str(self.company_id.id) #loca 14
+            company_id = self.company_id.id #loca 14
+            IrSequence = self.env['ir.sequence'].with_context(force_company=company_id) #loca 14
+            name = IrSequence.next_by_code(SEQUENCE_CODE)
+
+            # si aún no existe una secuencia para esta empresa, cree una
+            if not name:
+                IrSequence.sudo().create({
+                    'prefix': '00-',
+                    'name': 'Localización Venezolana nro control Unico Factura Forma Libre %s' % 1,
+                    'code': SEQUENCE_CODE,
+                    'implementation': 'no_gap',
+                    'padding': 4,
+                    'number_increment': 1,
+                    'company_id': company_id, #loca 14
+                })
+                name = IrSequence.next_by_code(SEQUENCE_CODE)
+            #self.invoice_number_cli=name
+        """else:
+            name='0'"""
+        return name
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'

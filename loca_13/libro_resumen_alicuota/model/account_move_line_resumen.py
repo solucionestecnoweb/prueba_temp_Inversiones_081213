@@ -42,7 +42,7 @@ class ResumenAlicuota(models.Model):
     tipo_doc = fields.Char()
     fecha_fact= fields.Date()
     fecha_comprobante= fields.Date()
-    company_id = fields.Many2one('res.company', string='Company',default=lambda self: self.env.company)#loca14
+    company_id = fields.Many2one('res.company', string='Company',default=lambda self: self.env.company.id)#loca14
 
 
     def _nro_comp(self):

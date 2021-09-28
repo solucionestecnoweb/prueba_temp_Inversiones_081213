@@ -143,10 +143,6 @@ class WizardReport_2(models.TransientModel): # aqui declaro las variables del wi
         return {'type': 'ir.actions.report','report_name': 'l10n_ve_reportes_div_extranjeras.reporte_mon_local_extranjera','report_type':"qweb-pdf"}
         #raise UserError(_('lista_mov_line = %s')%self.line)
 
-    def conv_div(self,valor):
-        resultado=0
-        resultado=valor/3200000
-        return resultado
 
     def conv_div_extranjera(self,valor,selff):
         #raise UserError(_('moneda compañia: %s')%selff.move_id.id)
@@ -171,7 +167,7 @@ class WizardReport_2(models.TransientModel): # aqui declaro las variables del wi
             for det_mov in tabla_move:
                 tasa= self.env['res.currency.rate'].search([('currency_id','=',self.moneda_id.id),('name','<=',det_mov.date)],order="name asc")
                 if not tasa:
-                    raise UserError(_('No hay una tasa de conversion para esta moneda seleccionada'))
+                    raise UserError(_('No hay una tasa de conversion para esta moneda seleccionada para este rango de fecha'))
                 for det_tasa in tasa:
                     if det_mov.date>=det_tasa.name:
                         valor_aux=det_tasa.rate

@@ -14,9 +14,9 @@
                     <group name="general_cli">
                         <group name="cuadro1">
                             <field name="razon" string="Razón Social"/>
-                            <field name="canal"/>
+                            <field name="canales" string="Canal"/>
                             <field name="mercado" string="Mercado"/>
-                            <field name="vendedor"/>
+                            <field name="vendedores" string="Vendedor"/>
                             <field name="formato"/>
                             <field name="responsable"/>
                         </group>

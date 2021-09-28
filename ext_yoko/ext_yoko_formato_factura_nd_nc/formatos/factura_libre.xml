@@ -38,7 +38,7 @@
                     <tr>
                       <td>TELEFONOS: <t t-esc="docs.partner_id.phone"/>/<t t-esc="docs.partner_id.mobile"/></td>
                       <t t-if="docs.type in ('out_invoice')">
-                        <td align="right"> CONDICION: </td>
+                        <td align="right"> CONDICIÓN: </td>
                         <td align="right"><t t-esc="docs.condicion"/></td>
                       </t>
                       <t t-else="">
@@ -47,7 +47,7 @@
                       </t>
                     </tr>
                     <tr>
-                      <td>DIRECCION: <t t-esc="docs.partner_id.street"/></td>
+                      <td>DIRECCIÓN: <t t-esc="docs.partner_id.street"/></td>
                       <t t-if="docs.type in ('out_invoice')">
                         <td align="right"> VENDEDOR: </td>
                         <td align="right"><t t-esc="docs.vendedor.name"/></td>
@@ -65,7 +65,7 @@
                   <table width="100%" >
                     <tbody class="table table-bordered">
                         <tr align="center" style="font-size:15px;">
-                          <td>CODIGO</td>
+                          <td>CÓDIGO</td>
                           <td>DESCRIPCIÓN</td>
                           <td>CANT.</td>
                           <td>UNID.</td>

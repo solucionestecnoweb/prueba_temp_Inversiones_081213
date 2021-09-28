@@ -33,19 +33,19 @@ class Partner(models.Model):
     contribuyente = fields.Selection(selection=[
         ('True','Si'),
         ('False','No')
-        ], required='True', default='True')
+        ], default='True')
     people_type = fields.Selection(string='People type', selection=[
         ('resident_nat_people','PNRE Residente Natural Person'),
         ('non_resit_nat_people','PNNR Non-resident Natural Person'),
         ('domi_ledal_entity','PJDO Domiciled Legal Entity'),
         ('legal_ent_not_domicilied','PJDO Legal Entity Not Domiciled'),
-    ], required="True")
+    ])#, required="True"
     seniat_url = fields.Char(string='GO SENIAT', readonly="True", default="http://contribuyente.seniat.gob.ve/BuscaRif/BuscaRif.jsp")
 
-    @api.onchange('vat','vendor')
+    """@api.onchange('vat','vendor')
     def _clean_vat(self):
         if self.vendor == 'international':
-            self.vat = ''
+            self.vat = ''"""
 
 
                 

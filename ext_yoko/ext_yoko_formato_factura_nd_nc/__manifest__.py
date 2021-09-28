@@ -13,13 +13,16 @@
     'website': 'http://soluciones-tecno.com/',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','account'],
+    'depends': ['base','account','vat_retention','ext_personalizacion_lanta'],
 
     # always loaded
     'data': [
         'formatos/factura_libre.xml',
+        'formatos/factura_libre_electronica.xml',
         'formatos/nota_entrega.xml',
         'formatos/account_move_view.xml',
+        'formatos/email_template_fact.xml',
+        'formatos/res_company_inherit.xml',
     	#'security/ir.model.access.csv',
         #'resumen_iva/reporte_view.xml',
         #'resumen_iva/wizard.xml',

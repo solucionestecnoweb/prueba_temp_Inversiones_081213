@@ -77,6 +77,26 @@
 		</field>
 	</record>
 
+	<record id="config_modelo_canal_tree" model="ir.ui.view">
+		<field name="name">config.modelo.canal.tree</field>
+		<field name="model">res.canal</field>
+		<field name="arch" type="xml">
+			<tree string="Configuracion de Canal del Cliente" >
+				<field name="name" string="Nombre del Canal"></field>		
+			</tree>
+		</field>
+	</record>
+
+	<record id="config_modelo_vendedor_tree" model="ir.ui.view">
+		<field name="name">config.modelo.vendedor.tree</field>
+		<field name="model">res.vendedor</field>
+		<field name="arch" type="xml">
+			<tree string="Configuracion Vendedor del Cliente" >
+				<field name="name" string="Nombre del Vendedor"></field>		
+			</tree>
+		</field>
+	</record>
+
 	
 <!-- ********************************************************************** -->
 	<record id="mercado_menu" model="ir.actions.act_window">
@@ -100,6 +120,20 @@
 		<field name="view_id" ref="config_modelo_formato_tree"></field>
 	</record>
 
+	<record id="canal_menu" model="ir.actions.act_window">
+		<field name="name">Configuracion de  Canal de Clientes</field>
+		<field name="res_model">res.canal</field>
+		<field name="view_mode">form,tree</field>
+		<field name="view_id" ref="config_modelo_canal_tree"></field>
+	</record>
+
+	<record id="vendedor_menu" model="ir.actions.act_window">
+		<field name="name">Configuracion Vendedor del Clientes</field>
+		<field name="res_model">res.vendedor</field>
+		<field name="view_mode">form,tree</field>
+		<field name="view_id" ref="config_modelo_vendedor_tree"></field>
+	</record>
+
 	<menuitem
 		id="menu_mercado"
 		name="Configuraciones de Mercado del Cliente" 
@@ -120,4 +154,18 @@
 		parent="sale.menu_sale_config"
 		action="formato_menu"
 		sequence="40"/>
+
+	<menuitem
+		id="menu_canal"
+		name="Configuraciones de canal del Cliente" 
+		parent="sale.menu_sale_config"
+		action="canal_menu"
+		sequence="50"/>
+
+	<menuitem
+		id="menu_vendedor"
+		name="Configuraciones Vendedor del Cliente" 
+		parent="sale.menu_sale_config"
+		action="vendedor_menu"
+		sequence="60"/>
 </odoo>

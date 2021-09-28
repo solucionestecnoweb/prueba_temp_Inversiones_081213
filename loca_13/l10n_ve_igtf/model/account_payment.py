@@ -51,6 +51,7 @@ class account_payment(models.Model):
                 raise ValidationError(_("The payment cannot be processed because the invoice is not open!"))
 
             # keep the name in case of a payment reset to draft
+            #raise UserError(_("mama 6=%s")%rec.name)
             if not rec.name:
                 # Use the right sequence to set the name
                 if rec.payment_type == 'transfer':
@@ -72,6 +73,7 @@ class account_payment(models.Model):
 
             moves = AccountMove.create(rec._prepare_payment_moves())
             moves.filtered(lambda move: move.journal_id.post_at != 'bank_rec').post()
+            #raise UserError(_("mama 8="))
 
             # Update the state / move before performing any reconciliation.
             move_name = self._get_move_name_transfer_separator().join(moves.mapped('name'))

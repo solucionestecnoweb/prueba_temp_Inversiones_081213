@@ -23,7 +23,7 @@
             </xpath>  
 
             <xpath expr="//field[@name='currency_id']" position="after">
-                <field name="doc_currency_id" attrs="{'invisible': [('type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund'))]}"/>
+                <field name="doc_currency_id" attrs="{'invisible': ['|',('type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund')),('currency_id','=',3)]}"/>
             </xpath>          
         </field>
     </record>

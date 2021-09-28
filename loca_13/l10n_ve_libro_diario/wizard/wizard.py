@@ -110,31 +110,56 @@ class WizardReport_1(models.TransientModel): # aqui declaro las variables del wi
 
 
     def print_libro_diario(self):
-    	t=self.env['libro.diario.wizard.pdf'].search([])
-    	w=self.env['wizard.libro.diario'].search([('id','!=',self.id)])
-    	t.unlink()
-    	w.unlink()
-    	cur_account=self.env['account.account'].search([],order="code asc")
-    	for det_account in cur_account:
-    		acum_deber=0
-    		acum_haber=0
-    		cursor = self.env['account.move.line'].search([('date', '>=', self.date_from),('date','<=',self.date_to),('account_id','=',det_account.id),('parent_state','=','posted')])
-    		"""if cursor:
-    			raise UserError(_('cursor = %s')%cursor)"""
-    		if cursor:
-    			for det in cursor:
-    				acum_deber=acum_deber+det.debit
-    				acum_haber=acum_haber+det.credit
-    			#raise UserError(_('lista_mov_line = %s')%acum_deber)
-    			values=({
-    				'account_id':det_account.id,
-    				'total_deber':acum_deber,
-    				'total_haber':acum_haber,
-    				'name':det_account.name,
-    				'fecha_desde':self.date_from,
-    				'fecha_hasta':self.date_to,
-    				})
-    			diario_id = t.create(values)
-    	self.line=self.env['libro.diario.wizard.pdf'].search([])
-    	return {'type': 'ir.actions.report','report_name': 'l10n_ve_libro_diario.reporte_libro_diario','report_type':"qweb-pdf"}
-    	#raise UserError(_('lista_mov_line = %s')%self.line)
+        t=self.env['libro.diario.wizard.pdf'].search([])
+        w=self.env['wizard.libro.diario'].search([('id','!=',self.id)])
+        t.unlink()
+        w.unlink()
+        cur_account=self.env['account.account'].search([],order="code asc")
+        for det_account in cur_account:
+            acum_deber=0
+            acum_haber=0
+            cursor = self.env['account.move.line'].search([('date', '>=', self.date_from),('date','<=',self.date_to),('account_id','=',det_account.id),('parent_state','=','posted')])
+            """if cursor:
+                raise UserError(_('cursor = %s')%cursor)"""
+            if cursor:
+                for det in cursor:
+                    acum_deber=acum_deber+det.debit #self.conv_div_extranjera(det.debit,det)
+                    acum_haber=acum_haber+det.credit #self.conv_div_extranjera(det.credit,det)
+                #raise UserError(_('lista_mov_line = %s')%acum_deber)
+                values=({
+                    'account_id':det_account.id,
+                    'total_deber':acum_deber,
+                    'total_haber':acum_haber,
+                    'name':det_account.name,
+                    'fecha_desde':self.date_from,
+                    'fecha_hasta':self.date_to,
+                    })
+                diario_id = t.create(values)
+        self.line=self.env['libro.diario.wizard.pdf'].search([])
+        return {'type': 'ir.actions.report','report_name': 'l10n_ve_libro_diario.reporte_libro_diario','report_type':"qweb-pdf"}
+        #raise UserError(_('lista_mov_line = %s')%self.line)
+
+    def conv_div(self,valor):
+        resultado=0
+        resultado=valor/3200000
+        return resultado
+
+    def conv_div_extranjera(self,valor,selff):
+        #raise UserError(_('moneda compañia: %s')%selff.move_id.id)
+        selff.move_id.currency_id.id
+        fecha_contable_doc=selff.move_id.date
+        monto_factura=selff.move_id.amount_total
+        valor_aux=0
+        #raise UserError(_('moneda compañia: %s')%self.company_id.currency_id.id)
+        if selff.move_id.currency_id.id!=self.env.company.currency_id.id:
+            tasa= self.env['account.move'].search([('id','=',selff.move_id.id)],order="id asc")
+            for det_tasa in tasa:
+                monto_nativo=det_tasa.amount_total_signed
+                monto_extran=det_tasa.amount_total
+                valor_aux=abs(monto_nativo/monto_extran)
+            rate=round(valor_aux,3)  # LANTA
+            #rate=round(valor_aux,2)  # ODOO SH
+            resultado=valor/rate
+        else:
+            resultado=valor
+        return resultado

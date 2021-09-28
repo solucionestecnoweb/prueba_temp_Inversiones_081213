@@ -15,5 +15,5 @@ class Partners(models.Model):
     ret_jrl_id = fields.Many2one('account.journal', string='Diario de Retenciones')
     account_ret_receivable_id = fields.Many2one('account.account', string='Cuenta Retencion a Cobrar (Clientes)')
     account_ret_payable_id = fields.Many2one('account.account', string='Cuenta Retencion a Pagar (Proveedores)')
-    doc_type = fields.Selection([('v','V'),('e','E'),('j','J'),('g','G'),('p','P'),('c','C')], required=True)
-    #doc_type = fields.Selection([('V','V'),('E','E'),('J','J'),('G','G'),('P','P'),('c','C')], required=True)
+    doc_type = fields.Selection([('v','V'),('e','E'),('j','J'),('g','G'),('p','P'),('c','C')],default='v')
+    #doc_type = fields.Selection([('v','V'),('e','E'),('j','J'),('g','G'),('p','P'),('c','C')], required=True)
