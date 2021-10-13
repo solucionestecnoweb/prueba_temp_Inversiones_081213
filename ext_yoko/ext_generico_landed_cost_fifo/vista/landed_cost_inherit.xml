@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="landed_cost_view_inherit2" model="ir.ui.view">
+        <field name="name">landed.cost.view.inherit2</field>
+        <field name="model">stock.landed.cost</field>
+        <field name="inherit_id" ref="stock_landed_costs.view_stock_landed_cost_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='cost_lines']/tree[1]/field[@name='split_method']" position="after">
+                <field name="price_unit_aux" widget="monetary" string="Costo"/>
+                <field name="currency_id" string="Moneda del costo"/>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[1]/field[@name='cost_lines']/tree[1]/field[@name='price_unit']" position="attributes">
+                <attribute name="attrs">{}</attribute>
+                <!--attribute name="readonly">1</attribute-->
+                <attribute name="string">Costo Final Bs</attribute>
+            </xpath>
+            <xpath expr="//form[1]/sheet[1]/notebook[1]" position="inside">
+                <page string="Resumen de Costo" name="studio_page_iGGTd">
+                  <group name="studio_group_iGGTd">
+                    <field name="line_resumen" nolabel="1" readonly="True">
+                        <tree string="Registro de Pagos" editable="buttom">
+                            <field name="descripcion" string="Producto"/>
+                            <field name="cantidad" string="Cantidad"/>
+                            <field name="costo_original" string="Monto total Original" readonly="1" widget="monetary"/>
+                            <field name="costo_adicional" string="Costo Adicional" widget='monetary'/>
+                            <field name="costo_total" string="Costo Total" widget='monetary'/>
+                            <field name="costo_unit_new" string="Costo Unitario" widget='monetary' options="{'currency_field': 'currency_company_id'}"/>
+                            <field name="costo_unit_new_div" string="Costo Unitario ($)"/>
+                        </tree>
+                    </field>
+                    <!--group name="studio_group_iGGTd_left"/>
+                    <group name="studio_group_iGGTd_right"/-->
+                  </group>
+                </page>
+            </xpath>
+            
+        </field>
+    </record>
+</odoo>
