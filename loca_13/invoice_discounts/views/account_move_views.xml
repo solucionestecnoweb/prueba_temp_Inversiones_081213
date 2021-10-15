@@ -6,11 +6,16 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='company_id']" position="after">
-                    <field name="is_discount"  widget="boolean_toggle"/>
-                    <field name="discount5"  widget="monetary" attrs="{'invisible': [('is_discount','=',False)]}"/>
-                    <field name="discount3"  widget="monetary" attrs="{'invisible': [('is_discount','=',False)]}"/>
-                    <field name="discount2"  widget="monetary" attrs="{'invisible': [('is_discount','=',False)]}"/>
+                <field name="is_discount"  widget="boolean_toggle"/>
+                <field name="discount5"  widget="monetary" attrs="{'invisible': [('is_discount','=',False)]}"/>
+                <field name="discount3"  widget="monetary" attrs="{'invisible': [('is_discount','=',False)]}"/>
+                <field name="discount2"  widget="monetary" attrs="{'invisible': [('is_discount','=',False)]}"/>
             </xpath>
+             <xpath expr="//field[@name='amount_by_group']" position="after">
+                 <field name="am_discount1"  widget="monetary" attrs="{'invisible': [('is_discount','=',False)]}"/>
+                 <field name="am_discount2"  widget="monetary" attrs="{'invisible': [('is_discount','=',False)]}"/>
+                 <field name="am_discount3"  widget="monetary" attrs="{'invisible': [('is_discount','=',False)]}"/>
+             </xpath>
         </field>
     </record>
 </odoo>
