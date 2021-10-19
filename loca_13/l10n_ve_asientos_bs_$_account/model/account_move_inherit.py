@@ -56,7 +56,7 @@ class AccountMove(models.Model):
                 if lista_tasa:
                     for det in lista_tasa:
                         valor=selff.amount_residual_signed*det.rate
-            selff.amount_residual_signed_bs=valor
+            selff.amount_residual_signed_bs = selff.amount_total_signed_aux_bs
 
     def _compute_monto_conversion_tax(self):
         valor=0

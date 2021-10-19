@@ -17,22 +17,27 @@ class AccountMove(models.Model):
     am_discount3 = fields.Float(string="Descuento #3", compute="_compute_discount_amount_total", store=True)
 
     def _compute_discount_amount_total(self):
+
         for move in self:
             if move.discount5 > 0.0:
-                disc5 = (move.amount_total * move.discount5) / 100
-                rest = (move.amount_total - disc5)
+                disc5 = (move.amount_untaxed * move.discount5) / 100
+                rest = (move.amount_untaxed - disc5)
                 move.am_discount1 = disc5
-                move.update({'amount_total': rest})
+                move.update({'amount_untaxed': rest})
+                move.update({'amount_total': rest + move.amount_tax})
             if move.discount3 > 0.0:
-                disc3 = (move.amount_total * move.discount3) / 100
-                rest = (move.amount_total - disc3)
+                disc3 = (move.amount_untaxed * move.discount3) / 100
+                rest = (move.amount_untaxed - disc3)
                 move.am_discount2 = disc3
-                move.update({'amount_total': rest})
-            if move.discount3 > 0.0:
-                disc2 = (move.amount_total * move.discount2) / 100
-                rest = (move.amount_total - disc2)
+                move.update({'amount_untaxed': rest})
+                move.update({'amount_total': rest + move.amount_tax})
+            if move.discount2 > 0.0:
+                disc2 = (move.amount_untaxed * move.discount2) / 100
+                rest = (move.amount_untaxed - disc2)
                 move.am_discount3 = disc2
-                move.update({'amount_total': rest})
+                move.update({'amount_untaxed': rest})
+                move.update({'amount_total': rest + move.amount_tax})
+
 
     @api.depends(
         'line_ids.debit',
